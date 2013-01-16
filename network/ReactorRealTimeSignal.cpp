@@ -30,8 +30,11 @@ CReactorRealTimeSignal::CReactorRealTimeSignal()
 {
 }
 
+
+
 CReactorRealTimeSignal::~CReactorRealTimeSignal()
 {
+//8989
 	Close();
 }
 
