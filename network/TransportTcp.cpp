@@ -105,6 +105,8 @@ int CTransportTcp::OnOutput(CM_HANDLE )
 	if (m_pSink == NULL)
 	{
 		VP_TRACE_ERROR("CTransportTcp::OnOutput m_pSink==NULL");
+		m_pReactor->ModifyHandleSignal(this,false);
+		m_mbBufferOne.Resize(0);
 		return 0;
 	}
 		
@@ -180,7 +182,7 @@ int CTransportTcp::SendData(CDataBlock &aData)
 
 	//if (static_cast<DWORD>(nRet) < aData.GetLen()) {
 		//VP_TRACE_ERROR("CTransportTcp::SendData, send=%d ret=%d err=%d",aData.GetLen(), nRet, errno);
-		//m_pReactor->ModifyHandleSignal(this, true);
+		m_pReactor->ModifyHandleSignal(this, true);
 		m_mbBufferOne.ResizeFromDataBlock(aData);
 		m_mbBufferOne.AdvanceReadPtr(0);
 	//}
