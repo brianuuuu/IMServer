@@ -102,33 +102,23 @@ int CTransportTcp::OnInput(CM_HANDLE )
 
 int CTransportTcp::OnOutput(CM_HANDLE )
 {
+	VP_TRACE_INFO("CTransportTcp::OnOutput()");
 	if (m_pSink == NULL)
-	{
-		VP_TRACE_ERROR("CTransportTcp::OnOutput m_pSink==NULL");
 		return 0;
-	}
-		
 	CM_ASSERTE(m_pSink);
 //	CM_INFO_LOG(("CTransportTcp::OnOutput"));
 	if (m_mbBufferOne.GetLength() == 0)
-	{
-		m_pReactor->ModifyHandleSignal(this,false);
 		return 0;
-	}
-		
+	
 	int nRet = Send_t(m_mbBufferOne.GetReadPtr(), m_mbBufferOne.GetLength());
 	if (nRet <= 0)
-	{
-		VP_TRACE_ERROR("CTransportTcp::OnOutput Send_t nRet=%d GetLength=%d",nRet,m_mbBufferOne.GetLength());
 		return nRet;
-	}
 
-	if ((DWORD)nRet < m_mbBufferOne.GetLength()) 
-	{
+	if ((DWORD)nRet < m_mbBufferOne.GetLength()) {
+		m_pReactor->ModifyHandleSignal(this, true);
 		m_mbBufferOne.AdvanceReadPtr((DWORD)nRet);
 	}
-	else 
-	{
+	else {
 		m_pReactor->ModifyHandleSignal(this,false);
 		m_mbBufferOne.Resize(0);
 		m_pSink->OnSend();
@@ -160,36 +150,20 @@ int CTransportTcp::Close_t(int aReason)
 
 int CTransportTcp::SendData(CDataBlock &aData)
 {
-	static int s_nIndex = 0;
-	s_nIndex++;
-		
 	if (m_mbBufferOne.GetLength() > 0)
-	{
-		m_pReactor->ModifyHandleSignal(this,true);
 		return -1;
-	}
-		
-	int nRet = CTransportTcp::Send_t(reinterpret_cast<LPSTR>(aData.GetBuf()), aData.GetLen());
 
-	//if (nRet < 0) 
-	//{
-	//	VP_TRACE_ERROR("CTransportTcp::SendData nRet=%d errno=%d",nRet,errno);
-	//	return nRet;
-	//}
-		
-	//if (s_nIndex%100==0)
-	//{
-		//VP_TRACE_INFO("CTransportTcp::SendData GetLen=%d nRet=%d",aData.GetLen(),nRet);
-	//}
+	m_pReactor->ModifyHandleSignal(this, true);
+	/*int nRet = CTransportTcp::Send_t(reinterpret_cast<LPSTR>(aData.GetBuf()), aData.GetLen());
+	if (nRet < 0) 
+		return nRet;*/
 
-	if (nRet < 0
-		||static_cast<DWORD>(nRet) < aData.GetLen()) {
-		VP_TRACE_ERROR("CTransportTcp::SendData send=%d ret=%d err=%d",aData.GetLen(), nRet, errno);
-		m_pReactor->ModifyHandleSignal(this, true);
+	//if (static_cast<DWORD>(nRet) < aData.GetLen()) {
+		//VP_TRACE_ERROR("CTransportTcp::SendData, send=%d ret=%d err=%d",aData.GetLen(), nRet, errno);
+		//m_pReactor->ModifyHandleSignal(this, true);
 		m_mbBufferOne.ResizeFromDataBlock(aData);
-		m_mbBufferOne.AdvanceReadPtr(nRet);
-	}
-
+		m_mbBufferOne.AdvanceReadPtr(0);
+	//}
 	return 0;
 }
 

@@ -30,11 +30,8 @@ CReactorRealTimeSignal::CReactorRealTimeSignal()
 {
 }
 
-
-
 CReactorRealTimeSignal::~CReactorRealTimeSignal()
 {
-//8989
 	Close();
 }
 
@@ -346,7 +343,7 @@ int CReactorRealTimeSignal::HandleIoEvents(const CTimeValue &aTimeout)
 	
 	struct epoll_event events[20];
 	int nfds = epoll_wait(m_epfd,events,20,-1);
-	//VP_TRACE_INFO("CReactorRealTimeSignal::HandleIoEvents nfds=%d",nfds);
+	VP_TRACE_INFO("CReactorRealTimeSignal::HandleIoEvents nfds=%d",nfds);
 	int i = 0;
 	for(i=0;i<nfds;++i)
 	{

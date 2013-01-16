@@ -144,6 +144,7 @@ int CConnectorTcpT<UpperType, UpTrptType, UpSockType>::DoConnect(UpTrptType *aTr
 	nRet = m_pReactor->RegisterHandler(this, CEventHandlerBase::CONNECT_MASK);
 	if (nRet == -1)
 		return -1;
+	m_pReactor->ModifyHandleSignal(this,true);
 
 	nRet = ::connect((CM_SOCKET)sockPeer.GetHandle(), 
 					  reinterpret_cast<const struct sockaddr *>(aAddr.GetPtr()), 
